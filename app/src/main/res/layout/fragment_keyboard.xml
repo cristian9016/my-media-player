@@ -1,0 +1,306 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+    </data>
+    <android.support.constraint.ConstraintLayout
+
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent" android:background="@color/colorBackground">
+        <TextView
+                android:text="A"
+                android:layout_width="40dp"
+                android:layout_height="30dp"
+                android:id="@+id/btnA"
+                android:textSize="18dp"
+                android:gravity="center"
+                android:textColor="@android:color/white"
+                android:background="@color/colorBackground"
+                app:layout_constraintStart_toStartOf="parent" app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintEnd_toStartOf="@+id/btnB" app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toTopOf="@+id/btnD"/>
+        <TextView
+                android:text="B"
+                android:layout_width="40dp"
+                android:layout_height="30dp"
+                android:id="@+id/btnB" android:textSize="18dp"
+                android:gravity="center"
+                android:textColor="@android:color/white" android:background="@color/colorBackground"
+                app:layout_constraintStart_toEndOf="@+id/btnA" app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintEnd_toStartOf="@+id/btnC" app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toTopOf="@+id/btnE"/>
+        <TextView
+                android:text="C"
+                android:layout_width="40dp"
+                android:layout_height="30dp"
+                android:id="@+id/btnC" android:textSize="18dp"
+                android:gravity="center"
+                android:textColor="@android:color/white" android:background="@color/colorBackground"
+                app:layout_constraintStart_toEndOf="@+id/btnB" app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintEnd_toEndOf="parent" app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toTopOf="@+id/btnF"/>
+        <TextView
+                android:text="E"
+                android:layout_width="40dp"
+                android:layout_height="30dp" android:id="@+id/btnE"
+                android:textSize="18dp" android:gravity="center"
+                android:textColor="@android:color/white"
+                android:background="@color/colorBackground"
+                app:layout_constraintStart_toEndOf="@+id/btnD" app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintEnd_toStartOf="@+id/btnF" app:layout_constraintTop_toBottomOf="@+id/btnB"
+                app:layout_constraintBottom_toTopOf="@+id/btnH"/>
+        <TextView
+                android:text="D"
+                android:layout_width="40dp"
+                android:layout_height="30dp" android:id="@+id/btnD"
+                android:textSize="18dp" android:gravity="center"
+                android:textColor="@android:color/white" android:background="@color/colorBackground"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintHorizontal_bias="0.5" app:layout_constraintEnd_toStartOf="@+id/btnE"
+                app:layout_constraintTop_toBottomOf="@+id/btnA" app:layout_constraintBottom_toTopOf="@+id/btnG"/>
+        <TextView
+                android:text="F"
+                android:layout_width="40dp"
+                android:layout_height="30dp"
+                android:id="@+id/btnF" android:textSize="18dp"
+                android:gravity="center"
+                android:textColor="@android:color/white" android:background="@color/colorBackground"
+                app:layout_constraintStart_toEndOf="@+id/btnE" app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintEnd_toEndOf="parent" app:layout_constraintTop_toBottomOf="@+id/btnC"
+                app:layout_constraintBottom_toTopOf="@+id/btnI"/>
+        <TextView
+                android:text="G"
+                android:layout_width="40dp"
+                android:layout_height="30dp"
+                android:id="@+id/btnG" android:textSize="18dp"
+                android:gravity="center"
+                android:textColor="@android:color/white" android:background="@color/colorBackground"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintHorizontal_bias="0.5" app:layout_constraintEnd_toStartOf="@+id/btnH"
+                app:layout_constraintTop_toBottomOf="@+id/btnD" app:layout_constraintBottom_toTopOf="@+id/btnJ"/>
+        <TextView
+                android:text="H"
+                android:layout_width="40dp"
+                android:layout_height="30dp"
+                android:id="@+id/btnH" android:textSize="18dp"
+                android:gravity="center"
+                android:textColor="@android:color/white" android:background="@color/colorBackground"
+                app:layout_constraintStart_toEndOf="@+id/btnG" app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintEnd_toStartOf="@+id/btnI" app:layout_constraintTop_toBottomOf="@+id/btnE"
+                app:layout_constraintBottom_toTopOf="@+id/btnK"/>
+        <TextView
+                android:text="I"
+                android:layout_width="40dp"
+                android:layout_height="30dp"
+                android:id="@+id/btnI" android:textSize="18dp"
+                android:gravity="center"
+                android:textColor="@android:color/white" android:background="@color/colorBackground"
+                app:layout_constraintStart_toEndOf="@+id/btnH" app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintEnd_toEndOf="parent" app:layout_constraintTop_toBottomOf="@+id/btnF"
+                app:layout_constraintBottom_toTopOf="@+id/btnL"/>
+        <TextView
+                android:text="J"
+                android:layout_width="40dp"
+                android:layout_height="30dp"
+                android:id="@+id/btnJ" android:textSize="18dp"
+                android:gravity="center"
+                android:textColor="@android:color/white" android:background="@color/colorBackground"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintHorizontal_bias="0.5" app:layout_constraintEnd_toStartOf="@+id/btnK"
+                app:layout_constraintTop_toBottomOf="@+id/btnG" app:layout_constraintBottom_toTopOf="@+id/btnM"/>
+        <TextView
+                android:text="K"
+                android:layout_width="40dp"
+                android:layout_height="30dp"
+                android:id="@+id/btnK" android:textSize="18dp"
+                android:gravity="center"
+                android:textColor="@android:color/white" android:background="@color/colorBackground"
+                app:layout_constraintStart_toEndOf="@+id/btnJ" app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintEnd_toStartOf="@+id/btnL" app:layout_constraintTop_toBottomOf="@+id/btnH"
+                app:layout_constraintBottom_toTopOf="@+id/btnN"/>
+        <TextView
+                android:text="L"
+                android:layout_width="40dp"
+                android:layout_height="30dp"
+                android:id="@+id/btnL" android:textSize="18dp"
+                android:gravity="center"
+                android:textColor="@android:color/white" android:background="@color/colorBackground"
+                app:layout_constraintStart_toEndOf="@+id/btnK" app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintEnd_toEndOf="parent" app:layout_constraintTop_toBottomOf="@+id/btnI"
+                app:layout_constraintBottom_toTopOf="@+id/btnNh"/>
+        <TextView
+                android:text="M"
+                android:layout_width="40dp"
+                android:layout_height="30dp"
+                android:id="@+id/btnM" android:textSize="18dp"
+                android:gravity="center"
+                android:textColor="@android:color/white"
+                android:background="@color/colorBackground"
+                app:layout_constraintStart_toStartOf="parent" app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintEnd_toStartOf="@+id/btnN" app:layout_constraintTop_toBottomOf="@+id/btnJ"
+                app:layout_constraintBottom_toTopOf="@+id/btnO"/>
+        <TextView
+                android:text="N"
+                android:layout_width="40dp"
+                android:layout_height="30dp"
+                android:id="@+id/btnN" android:textSize="18dp"
+                android:gravity="center"
+                android:textColor="@android:color/white"
+                android:background="@color/colorBackground"
+                app:layout_constraintStart_toEndOf="@+id/btnM"
+                app:layout_constraintHorizontal_bias="0.5" app:layout_constraintEnd_toStartOf="@+id/btnNh"
+                app:layout_constraintTop_toBottomOf="@+id/btnK" app:layout_constraintBottom_toTopOf="@+id/btnP"/>
+        <TextView
+                android:text="O"
+                android:layout_width="40dp"
+                android:layout_height="30dp"
+                android:id="@+id/btnO" android:textSize="18dp"
+                android:gravity="center"
+                android:textColor="@android:color/white"
+                android:background="@color/colorBackground"
+                app:layout_constraintStart_toStartOf="parent" app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintEnd_toStartOf="@+id/btnP" app:layout_constraintTop_toBottomOf="@+id/btnM"
+                app:layout_constraintBottom_toTopOf="@+id/btnR"/>
+        <TextView
+                android:text="P"
+                android:layout_width="40dp"
+                android:layout_height="30dp"
+                android:id="@+id/btnP" android:textSize="18dp"
+                android:gravity="center"
+                android:textColor="@android:color/white"
+                android:background="@color/colorBackground"
+                app:layout_constraintStart_toEndOf="@+id/btnO"
+                app:layout_constraintHorizontal_bias="0.5" app:layout_constraintEnd_toStartOf="@+id/btnQ"
+                app:layout_constraintTop_toBottomOf="@+id/btnN" app:layout_constraintBottom_toTopOf="@+id/btnS"/>
+        <TextView
+                android:text="Q"
+                android:layout_width="40dp"
+                android:layout_height="30dp"
+                android:id="@+id/btnQ" android:textSize="18dp"
+                android:gravity="center"
+                android:textColor="@android:color/white"
+                android:background="@color/colorBackground"
+                app:layout_constraintStart_toEndOf="@+id/btnP"
+                app:layout_constraintHorizontal_bias="0.5" app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/btnNh" app:layout_constraintBottom_toTopOf="@+id/btnT"/>
+        <TextView
+                android:text="R"
+                android:layout_width="40dp"
+                android:layout_height="30dp"
+                android:id="@+id/btnR" android:textSize="18dp"
+                android:gravity="center"
+                android:textColor="@android:color/white"
+                android:background="@color/colorBackground"
+                app:layout_constraintStart_toStartOf="parent" app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintEnd_toStartOf="@+id/btnS" app:layout_constraintTop_toBottomOf="@+id/btnO"
+                app:layout_constraintBottom_toTopOf="@+id/btnU"/>
+        <TextView
+                android:text="S"
+                android:layout_width="40dp"
+                android:layout_height="30dp"
+                android:id="@+id/btnS" android:textSize="18dp"
+                android:gravity="center"
+                android:textColor="@android:color/white"
+                android:background="@color/colorBackground"
+                app:layout_constraintStart_toEndOf="@+id/btnR"
+                app:layout_constraintHorizontal_bias="0.5" app:layout_constraintEnd_toStartOf="@+id/btnT"
+                app:layout_constraintTop_toBottomOf="@+id/btnP" app:layout_constraintBottom_toTopOf="@+id/btnV"/>
+        <TextView
+                android:text="T"
+                android:layout_width="40dp"
+                android:layout_height="30dp"
+                android:id="@+id/btnT" android:textSize="18dp"
+                android:gravity="center"
+                android:textColor="@android:color/white"
+                android:background="@color/colorBackground"
+                app:layout_constraintStart_toEndOf="@+id/btnS"
+                app:layout_constraintHorizontal_bias="0.5" app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/btnQ" app:layout_constraintBottom_toTopOf="@+id/btnW"/>
+        <TextView
+                android:text="U"
+                android:layout_width="40dp"
+                android:layout_height="30dp"
+                android:id="@+id/btnU" android:textSize="18dp"
+                android:gravity="center"
+                android:textColor="@android:color/white"
+                android:background="@color/colorBackground"
+                app:layout_constraintStart_toStartOf="parent" app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintEnd_toStartOf="@+id/btnV" app:layout_constraintTop_toBottomOf="@+id/btnR"
+                app:layout_constraintBottom_toTopOf="@+id/btnX"/>
+        <TextView
+                android:text="V"
+                android:layout_width="40dp"
+                android:layout_height="30dp"
+                android:id="@+id/btnV" android:textSize="18dp"
+                android:gravity="center"
+                android:textColor="@android:color/white"
+                android:background="@color/colorBackground"
+                app:layout_constraintStart_toEndOf="@+id/btnU"
+                app:layout_constraintHorizontal_bias="0.5" app:layout_constraintEnd_toStartOf="@+id/btnW"
+                app:layout_constraintTop_toBottomOf="@+id/btnS" app:layout_constraintBottom_toTopOf="@+id/btnY"/>
+        <TextView
+                android:text="Ñ"
+                android:layout_width="40dp"
+                android:layout_height="30dp"
+                android:id="@+id/btnNh" android:textSize="18dp"
+                android:gravity="center"
+                android:textColor="@android:color/white"
+                android:background="@color/colorBackground"
+                app:layout_constraintStart_toEndOf="@+id/btnN"
+                app:layout_constraintHorizontal_bias="0.5" app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/btnL" app:layout_constraintBottom_toTopOf="@+id/btnQ"/>
+        <TextView
+                android:text="W"
+                android:layout_width="40dp"
+                android:layout_height="30dp"
+                android:id="@+id/btnW" android:textSize="18dp"
+                android:gravity="center"
+                android:textColor="@android:color/white"
+                android:background="@color/colorBackground"
+                app:layout_constraintStart_toEndOf="@+id/btnV"
+                app:layout_constraintHorizontal_bias="0.5" app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/btnT" app:layout_constraintBottom_toTopOf="@+id/btnZ"/>
+        <TextView
+                android:text="X"
+                android:layout_width="40dp"
+                android:layout_height="30dp"
+                android:id="@+id/btnX" android:textSize="18dp"
+                android:gravity="center"
+                android:textColor="@android:color/white" android:background="@color/colorBackground"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintHorizontal_bias="0.5" app:layout_constraintEnd_toStartOf="@+id/btnY"
+                app:layout_constraintTop_toBottomOf="@+id/btnU" app:layout_constraintBottom_toTopOf="@+id/btnDel"/>
+        <TextView
+                android:text="Y"
+                android:layout_width="40dp"
+                android:layout_height="30dp"
+                android:id="@+id/btnY" android:textSize="18dp"
+                android:gravity="center"
+                android:textColor="@android:color/white" android:background="@color/colorBackground"
+                app:layout_constraintStart_toEndOf="@+id/btnX" app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintEnd_toStartOf="@+id/btnZ" app:layout_constraintTop_toBottomOf="@+id/btnV"
+                app:layout_constraintBottom_toTopOf="@+id/btnDel"/>
+        <TextView
+                android:text="Z"
+                android:layout_width="40dp"
+                android:layout_height="30dp"
+                android:id="@+id/btnZ" android:textSize="18dp"
+                android:gravity="center"
+                android:textColor="@android:color/white" android:background="@color/colorBackground"
+                app:layout_constraintStart_toEndOf="@+id/btnY" app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintEnd_toEndOf="parent" app:layout_constraintTop_toBottomOf="@+id/btnW"
+                app:layout_constraintBottom_toTopOf="@+id/btnDel"/>
+        <TextView
+                android:text="DEL"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:id="@+id/btnDel"
+                android:background="@color/colorBackground" android:textColor="@android:color/white"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent" android:gravity="center" android:textSize="24dp"/>
+    </android.support.constraint.ConstraintLayout>
+</layout>

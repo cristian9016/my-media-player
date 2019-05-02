@@ -2,6 +2,7 @@ package com.cristiandev.mymusicplayer.main
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.arch.lifecycle.ViewModelProviders
 import android.content.ComponentName
 import android.content.Context
@@ -9,6 +10,7 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.content.res.ColorStateList
 import android.databinding.DataBindingUtil
+import android.databinding.adapters.TextViewBindingAdapter
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
@@ -20,12 +22,16 @@ import android.support.v7.widget.LinearLayoutManager
 import android.util.Log
 import android.view.View
 import android.view.WindowManager
+import android.view.inputmethod.InputMethodManager
 import com.cristiandev.mymusicplayer.R
 import com.cristiandev.mymusicplayer.data.Prefs
 import com.cristiandev.mymusicplayer.data.adapter.SongAdapter
 import com.cristiandev.mymusicplayer.databinding.ActivityMainBinding
+import com.cristiandev.mymusicplayer.keyboard.KeyboardFragment.Companion.publishText
 import com.cristiandev.mymusicplayer.service.MusicService
+import com.cristiandev.mymusicplayer.service.StartAppService
 import com.cristiandev.mymusicplayer.util.LifeDisposable
+import com.jakewharton.rxbinding.widget.RxTextView
 import com.tbruyelle.rxpermissions2.RxPermissions
 import io.reactivex.Observable
 import io.reactivex.rxkotlin.subscribeBy
@@ -47,13 +53,16 @@ class MainActivity : AppCompatActivity() {
     private val myRunnable = Runnable { screensaver.visibility = View.VISIBLE }
     private val myHandler = Handler()
     lateinit var binding: ActivityMainBinding
+    lateinit var lm: LinearLayoutManager
 
     @SuppressLint("CheckResult", "WakelockTimeout")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
+        startService(Intent(this, StartAppService::class.java))
         songList.adapter = songAdapter
-        songList.layoutManager = LinearLayoutManager(this)
+        lm = LinearLayoutManager(this)
+        songList.layoutManager = lm
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         permissions.request(Manifest.permission.READ_EXTERNAL_STORAGE)
             .subscribe { allow ->
@@ -76,6 +85,25 @@ class MainActivity : AppCompatActivity() {
                 setAnimationVisible()
             }
         }
+
+        etSearch.setOnClickListener {
+            setAnimationVisible()
+            supportFragmentManager
+                .beginTransaction()
+                .show(keyboardFragment)
+                .commit()
+        }
+        RxTextView.textChanges(etSearch)
+            .subscribe {
+                setAnimationVisible()
+                val search = songAdapter.data.find { song ->
+                    song.title.toLowerCase().contains(Regex(it.toString().toLowerCase()))
+                }
+//                if (search != null) songList.scrollToPosition(songAdapter.data.indexOf(search))
+                if (search != null) lm.scrollToPositionWithOffset(songAdapter.data.indexOf(search), 2)
+
+            }
+
         btnShuffle.setOnClickListener {
             setAnimationVisible()
             viewModel.isServiceRunning(mService)
@@ -151,16 +179,16 @@ class MainActivity : AppCompatActivity() {
                             mService!!.stop()
                             stopService(mIntent)
                             mService = null
-                            btnPlay.setImageDrawable(getDrawable(R.drawable.ic_play))
+                            btnPlay.setImageDrawable(getDrawable(R.drawable.btn_play))
                         } else {
                             mService!!.playSong()
-                            btnPlay.setImageDrawable(getDrawable(R.drawable.ic_stop))
+                            btnPlay.setImageDrawable(getDrawable(R.drawable.btn_stop))
                         }
                     } else {
                         startServ().subscribeBy(
                             onNext = {
                                 mService!!.playSong()
-                                btnPlay.setImageDrawable(getDrawable(R.drawable.ic_stop))
+                                btnPlay.setImageDrawable(getDrawable(R.drawable.btn_stop))
                             }, onError = {
                                 toast(it.message!!)
                             }
@@ -178,12 +206,18 @@ class MainActivity : AppCompatActivity() {
     @SuppressLint("CheckResult")
     override fun onResume() {
         super.onResume()
+
+        supportFragmentManager
+            .beginTransaction()
+            .hide(keyboardFragment)
+            .commit()
+
         if (paused)
             paused = false
 
         hearPlayingSong
             .subscribe { (currPos, prevPos) ->
-                btnPlay.setImageDrawable(getDrawable(R.drawable.ic_stop))
+                btnPlay.setImageDrawable(getDrawable(R.drawable.btn_stop))
                 songAdapter.data[prevPos].isPlaying = false
                 songAdapter.notifyItemChanged(prevPos)
                 songAdapter.data[currPos].isPlaying = true
@@ -193,6 +227,10 @@ class MainActivity : AppCompatActivity() {
 
         dis add songAdapter.onClickSong
             .subscribe { song ->
+                supportFragmentManager
+                    .beginTransaction()
+                    .hide(keyboardFragment)
+                    .commit()
                 setAnimationVisible()
                 viewModel.isServiceRunning(mService)
                     .subscribe {
@@ -219,6 +257,11 @@ class MainActivity : AppCompatActivity() {
                         }
                     }
             }
+        publishText.subscribe {
+            setAnimationGone()
+            setAnimationVisible()
+            etSearch.setText(it)
+        }
     }
 
     override fun onPause() {
@@ -285,6 +328,11 @@ class MainActivity : AppCompatActivity() {
             startService(mIntent)
             Handler().postDelayed({ it.onNext(true) }, 250)
         }
+
+    fun scrollToPosition(position: Int) {
+        val first = lm.findFirstVisibleItemPosition()
+        val last = lm.findLastVisibleItemPosition()
+    }
 
     companion object {
         val hearPlayingSong = PublishSubject.create<Pair<Int, Int>>()

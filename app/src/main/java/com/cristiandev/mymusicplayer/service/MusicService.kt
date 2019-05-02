@@ -1,9 +1,8 @@
 package com.cristiandev.mymusicplayer.service
 
 import android.app.*
-import android.content.ContentUris
-import android.content.Context
-import android.content.Intent
+import android.bluetooth.BluetoothAdapter
+import android.content.*
 import android.media.AudioManager
 import android.media.MediaPlayer
 import android.os.Binder
@@ -17,11 +16,12 @@ import com.cristiandev.mymusicplayer.R
 import com.cristiandev.mymusicplayer.data.model.Song
 import com.cristiandev.mymusicplayer.main.MainActivity
 import com.cristiandev.mymusicplayer.main.MainActivity.Companion.hearPlayingSong
+import org.jetbrains.anko.startActivity
 import java.lang.Exception
 import java.util.*
 
 class MusicService : Service(), MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListener,
-    MediaPlayer.OnCompletionListener {
+    MediaPlayer.OnCompletionListener,AudioManager.OnAudioFocusChangeListener {
 
     lateinit var player: MediaPlayer
     private var thsSongs = mutableListOf<Song>()
@@ -32,8 +32,10 @@ class MusicService : Service(), MediaPlayer.OnPreparedListener, MediaPlayer.OnEr
     val NOTIFY_ID = 1
     var shuffle = false
     lateinit var rand: Random
+//    lateinit var focus:AudioManager
 
     override fun onCreate() {
+//        focus = AudioManager
         createNotificationChannel()
         player = MediaPlayer()
         initMusicPlayer()
@@ -182,5 +184,8 @@ class MusicService : Service(), MediaPlayer.OnPreparedListener, MediaPlayer.OnEr
         }
     }
 
+    override fun onAudioFocusChange(focusChange: Int) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
 
 }
