@@ -2,27 +2,20 @@ package com.cristiandev.mymusicplayer.main
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.arch.lifecycle.ViewModelProviders
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
-import android.content.res.ColorStateList
 import android.databinding.DataBindingUtil
-import android.databinding.adapters.TextViewBindingAdapter
-import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.IBinder
-import android.support.annotation.RequiresApi
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
-import android.util.Log
 import android.view.View
 import android.view.WindowManager
-import android.view.inputmethod.InputMethodManager
 import com.cristiandev.mymusicplayer.R
 import com.cristiandev.mymusicplayer.data.Prefs
 import com.cristiandev.mymusicplayer.data.adapter.SongAdapter
@@ -31,12 +24,14 @@ import com.cristiandev.mymusicplayer.keyboard.KeyboardFragment.Companion.publish
 import com.cristiandev.mymusicplayer.service.MusicService
 import com.cristiandev.mymusicplayer.service.StartAppService
 import com.cristiandev.mymusicplayer.util.LifeDisposable
+import com.cristiandev.mymusicplayer.video.VideoActivity
 import com.jakewharton.rxbinding.widget.RxTextView
 import com.tbruyelle.rxpermissions2.RxPermissions
 import io.reactivex.Observable
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.subjects.PublishSubject
 import kotlinx.android.synthetic.main.activity_main.*
+import org.jetbrains.anko.startActivity
 import org.jetbrains.anko.toast
 
 class MainActivity : AppCompatActivity() {
@@ -58,6 +53,10 @@ class MainActivity : AppCompatActivity() {
     @SuppressLint("CheckResult", "WakelockTimeout")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (!Prefs.typeMusic) {
+            startActivity<VideoActivity>()
+            finish()
+        }
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
         startService(Intent(this, StartAppService::class.java))
         songList.adapter = songAdapter
@@ -87,6 +86,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         etSearch.setOnClickListener {
+            etHint.visibility = View.GONE
             setAnimationVisible()
             supportFragmentManager
                 .beginTransaction()
@@ -95,13 +95,13 @@ class MainActivity : AppCompatActivity() {
         }
         RxTextView.textChanges(etSearch)
             .subscribe {
-                setAnimationVisible()
-                val search = songAdapter.data.find { song ->
-                    song.title.toLowerCase().contains(Regex(it.toString().toLowerCase()))
-                }
-//                if (search != null) songList.scrollToPosition(songAdapter.data.indexOf(search))
-                if (search != null) lm.scrollToPositionWithOffset(songAdapter.data.indexOf(search), 2)
-
+                if(it.toString().isNotEmpty()){
+                    setAnimationVisible()
+                    val search = songAdapter.data.find { song ->
+                        song.title.toLowerCase().contains(Regex(it.toString().toLowerCase()))
+                    }
+                    if (search != null) lm.scrollToPositionWithOffset(songAdapter.data.indexOf(search), 2)
+                }else etHint.visibility = View.GONE
             }
 
         btnShuffle.setOnClickListener {
@@ -195,6 +195,11 @@ class MainActivity : AppCompatActivity() {
                         )
                     }
                 }
+        }
+        swVideo.setOnClickListener {
+            startActivity<VideoActivity>()
+            Prefs.typeMusic = false
+            finish()
         }
         animationContainer.setOnClickListener {
             setAnimationGone()
@@ -312,9 +317,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
-        Prefs.shuffle = mService!!.shuffle
-        Prefs.lastSong = mService!!.getCurrentPosition()
-        stopService(mIntent)
+        if(mService!=null){
+            Prefs.shuffle = mService!!.shuffle
+            Prefs.lastSong = mService!!.getCurrentPosition()
+            stopService(mIntent)
+        }
         super.onDestroy()
     }
 
@@ -328,11 +335,6 @@ class MainActivity : AppCompatActivity() {
             startService(mIntent)
             Handler().postDelayed({ it.onNext(true) }, 250)
         }
-
-    fun scrollToPosition(position: Int) {
-        val first = lm.findFirstVisibleItemPosition()
-        val last = lm.findLastVisibleItemPosition()
-    }
 
     companion object {
         val hearPlayingSong = PublishSubject.create<Pair<Int, Int>>()

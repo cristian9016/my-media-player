@@ -24,22 +24,13 @@
                                               android:id="@+id/guideline"
                                               android:orientation="vertical"
                                               app:layout_constraintGuide_percent="0.75"/>
-        <TextClock
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                app:layout_constraintEnd_toEndOf="parent" android:layout_marginEnd="8dp"
-                app:layout_constraintStart_toStartOf="@+id/guideline" android:layout_marginStart="8dp"
-                android:layout_marginTop="8dp" app:layout_constraintTop_toTopOf="parent"
-                android:textSize="30sp" android:textColor="@android:color/white" android:id="@+id/textClock"
-                app:layout_constraintHorizontal_bias="0.5" app:layout_constraintBottom_toTopOf="@+id/btnPlay"
-                app:layout_constraintVertical_chainStyle="spread_inside" android:gravity="center"/>
         <ImageView
                 android:layout_width="100dp"
                 android:layout_height="100dp" app:srcCompat="@drawable/btn_play"
                 android:id="@+id/btnPlay" app:layout_constraintEnd_toEndOf="parent" android:layout_marginEnd="8dp"
                 app:layout_constraintStart_toStartOf="@+id/guideline" android:layout_marginStart="8dp"
-                app:layout_constraintTop_toBottomOf="@+id/textClock"
-                app:layout_constraintHorizontal_bias="0.5" app:layout_constraintBottom_toTopOf="@+id/btnShuffle"/>
+                app:layout_constraintHorizontal_bias="0.5" app:layout_constraintBottom_toTopOf="@+id/btnShuffle"
+                app:layout_constraintTop_toBottomOf="@+id/swVideo"/>
         <ImageView
                 android:layout_width="50dp"
                 android:layout_height="50dp" app:srcCompat="@drawable/btn_next"
@@ -56,12 +47,26 @@
                 android:layout_width="40dp"
                 android:layout_height="40dp" app:srcCompat="@drawable/ic_shuffle"
                 android:id="@+id/btnShuffle"
-                android:layout_marginTop="8dp"
-                app:layout_constraintTop_toBottomOf="@+id/btnPlay" app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
                 android:layout_marginEnd="8dp" app:layout_constraintStart_toStartOf="@+id/guideline"
                 android:layout_marginStart="8dp" app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintHorizontal_bias="0.5"/>
+                app:layout_constraintHorizontal_bias="0.5" app:layout_constraintTop_toBottomOf="@+id/btnPlay"/>
 
+        <ImageView
+                android:layout_width="80dp"
+                android:layout_height="80dp" app:srcCompat="@drawable/ic_video"
+                android:id="@+id/swVideo" app:layout_constraintStart_toStartOf="@+id/btnPlay"
+                app:layout_constraintEnd_toEndOf="@+id/btnPlay" app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintHorizontal_bias="0.5" app:layout_constraintBottom_toTopOf="@+id/btnPlay"
+                app:layout_constraintVertical_chainStyle="spread_inside"/>
+        <TextView
+                android:text="VIDEO"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/textView"
+                app:layout_constraintTop_toBottomOf="@+id/swVideo"
+                app:layout_constraintStart_toStartOf="@+id/swVideo"
+                app:layout_constraintEnd_toEndOf="@+id/swVideo" android:textColor="@android:color/white"/>
         <fragment
                 android:layout_width="0dp"
                 android:layout_height="0dp"
@@ -77,7 +82,8 @@
                 android:layout_height="wrap_content"
                 android:inputType="textPersonName"
                 android:ems="10"
-                android:id="@+id/etSearch" android:layout_marginEnd="8dp"
+                android:text="Buscar en Musica"
+                android:id="@+id/etHint" android:layout_marginEnd="8dp"
                 app:layout_constraintEnd_toStartOf="@+id/guideline" android:layout_marginStart="8dp"
                 app:layout_constraintStart_toStartOf="parent" android:layout_marginTop="8dp"
                 app:layout_constraintTop_toTopOf="parent"
@@ -86,10 +92,25 @@
         <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="0dp" app:srcCompat="@drawable/ic_search"
-                android:id="@+id/imageView"
                 app:layout_constraintEnd_toEndOf="@+id/etSearch" android:layout_marginEnd="8dp"
                 app:layout_constraintBottom_toBottomOf="@+id/etSearch"
                 app:layout_constraintTop_toTopOf="@+id/etSearch"/>
+        <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:inputType="textPersonName"
+                android:ems="10"
+                android:id="@+id/etSearch"
+                android:layout_marginEnd="8dp"
+                app:layout_constraintEnd_toStartOf="@+id/guideline" android:layout_marginStart="8dp"
+                app:layout_constraintStart_toStartOf="parent"
+                android:layout_marginTop="8dp"
+                app:layout_constraintTop_toTopOf="parent"
+                android:background="@drawable/textview_background"
+                android:textColor="@android:color/white"
+                android:gravity="center_vertical"
+                android:paddingLeft="8dp"
+                android:textSize="24dp"/>
         <com.airbnb.lottie.LottieAnimationView
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
@@ -116,17 +137,26 @@
                 android:text="@{title}"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:id="@+id/songTitle" app:layout_constraintStart_toStartOf="@+id/playingNowTxt"
+                app:layout_constraintStart_toStartOf="@+id/playingNowTxt"
                 app:layout_constraintEnd_toStartOf="@+id/guideline" android:layout_marginEnd="8dp"
                 tools:text="Titulo de la Cancion"
                 android:textAppearance="@style/TextAppearance.AppCompat.Display1"
                 android:textColor="@android:color/white"
                 app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintTop_toBottomOf="@+id/playingNowTxt" android:visibility="gone"/>
-        <android.support.constraint.Group android:layout_width="wrap_content" android:layout_height="wrap_content"
-                                          android:id="@+id/screensaver"
-                                          app:constraint_referenced_ids="animationContainer,songTitle,playingNowTxt"
-                                          android:visibility="gone"/>
+                app:layout_constraintTop_toBottomOf="@+id/playingNowTxt" android:visibility="gone"
+                android:id="@+id/songTitle"/>
+        <TextClock
+                android:layout_width="167dp"
+                android:layout_height="wrap_content"
+                android:textSize="30sp" android:textColor="@android:color/white" android:id="@+id/textClock"
+                android:gravity="center" android:layout_marginStart="8dp"
+                app:layout_constraintStart_toStartOf="parent" android:layout_marginBottom="8dp"
+                app:layout_constraintBottom_toBottomOf="parent"/>
+        <android.support.constraint.Group
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:id="@+id/screensaver"
+                app:constraint_referenced_ids="animationContainer,songTitle,playingNowTxt,textClock"
+                android:visibility="gone"/>
 
 
     </android.support.constraint.ConstraintLayout>
