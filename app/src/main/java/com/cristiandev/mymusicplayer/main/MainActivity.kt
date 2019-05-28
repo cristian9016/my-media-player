@@ -8,10 +8,12 @@ import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.databinding.DataBindingUtil
+import android.media.AudioManager
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.IBinder
+import android.support.v4.view.GestureDetectorCompat
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.view.View
@@ -19,19 +21,19 @@ import android.view.WindowManager
 import com.cristiandev.mymusicplayer.R
 import com.cristiandev.mymusicplayer.data.Prefs
 import com.cristiandev.mymusicplayer.data.adapter.SongAdapter
+import com.cristiandev.mymusicplayer.data.adapter.SwipeGestureListener
 import com.cristiandev.mymusicplayer.databinding.ActivityMainBinding
-import com.cristiandev.mymusicplayer.keyboard.KeyboardFragment.Companion.publishText
 import com.cristiandev.mymusicplayer.service.MusicService
 import com.cristiandev.mymusicplayer.service.StartAppService
 import com.cristiandev.mymusicplayer.util.LifeDisposable
-import com.cristiandev.mymusicplayer.video.VideoActivity
+import com.cristiandev.mymusicplayer.util.gone
+import com.cristiandev.mymusicplayer.util.visible
 import com.jakewharton.rxbinding.widget.RxTextView
 import com.tbruyelle.rxpermissions2.RxPermissions
 import io.reactivex.Observable
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.subjects.PublishSubject
 import kotlinx.android.synthetic.main.activity_main.*
-import org.jetbrains.anko.startActivity
 import org.jetbrains.anko.toast
 
 class MainActivity : AppCompatActivity() {
@@ -45,24 +47,25 @@ class MainActivity : AppCompatActivity() {
     var musicBound = false
     var paused = false
     var playBackPaused = false
-    private val myRunnable = Runnable { screensaver.visibility = View.VISIBLE }
+    private val myRunnable = Runnable { screensaver.visible() }
+    private val myVolumeRunnable = Runnable { volumeGroup.gone() }
     private val myHandler = Handler()
     lateinit var binding: ActivityMainBinding
     lateinit var lm: LinearLayoutManager
+    private val gestureListener = SwipeGestureListener()
+    private val audioManager: AudioManager by lazy { applicationContext.getSystemService(Context.AUDIO_SERVICE) as AudioManager }
 
     @SuppressLint("CheckResult", "WakelockTimeout")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        if (!Prefs.typeMusic) {
-            startActivity<VideoActivity>()
-            finish()
-        }
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
         startService(Intent(this, StartAppService::class.java))
         songList.adapter = songAdapter
         lm = LinearLayoutManager(this)
         songList.layoutManager = lm
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        val gestureDetectorCompat = GestureDetectorCompat(this, gestureListener)
+
         permissions.request(Manifest.permission.READ_EXTERNAL_STORAGE)
             .subscribe { allow ->
                 if (allow) {
@@ -85,23 +88,16 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        etSearch.setOnClickListener {
-            etHint.visibility = View.GONE
-            setAnimationVisible()
-            supportFragmentManager
-                .beginTransaction()
-                .show(keyboardFragment)
-                .commit()
-        }
+
         RxTextView.textChanges(etSearch)
             .subscribe {
-                if(it.toString().isNotEmpty()){
+                if (it.toString().isNotEmpty()) {
                     setAnimationVisible()
                     val search = songAdapter.data.find { song ->
                         song.title.toLowerCase().contains(Regex(it.toString().toLowerCase()))
                     }
                     if (search != null) lm.scrollToPositionWithOffset(songAdapter.data.indexOf(search), 2)
-                }else etHint.visibility = View.GONE
+                } else etHint.visible()
             }
 
         btnShuffle.setOnClickListener {
@@ -129,96 +125,47 @@ class MainActivity : AppCompatActivity() {
 
         }
         btnNext.setOnClickListener {
-            setAnimationVisible()
-            viewModel.isServiceRunning(mService)
-                .subscribe {
-                    if (it) {
-                        mService!!.playNext()
-                        if (playBackPaused)
-                            playBackPaused = false
-                        songList.scrollToPosition(mService!!.getCurrentPosition())
-                    } else {
-                        startServ()
-                            .subscribe {
-                                mService!!.playNext()
-                                if (playBackPaused)
-                                    playBackPaused = false
-                                songList.scrollToPosition(mService!!.getCurrentPosition())
-                            }
-                    }
-
-                }
-
+            actionNext()
         }
         btnPrevious.setOnClickListener {
-            setAnimationVisible()
-            viewModel.isServiceRunning(mService)
-                .subscribe {
-                    if (it) {
-                        mService!!.playPrev()
-                        if (playBackPaused)
-                            playBackPaused = false
-                        songList.scrollToPosition(mService!!.getCurrentPosition())
-                    } else {
-                        startServ()
-                            .subscribe {
-                                mService!!.playPrev()
-                                if (playBackPaused)
-                                    playBackPaused = false
-                                songList.scrollToPosition(mService!!.getCurrentPosition())
-                            }
-                    }
-                }
+            actionPrevious()
         }
         btnPlay.setOnClickListener {
-            setAnimationVisible()
-            viewModel.isServiceRunning(mService)
-                .subscribe {
-                    if (it) {
-                        if (mService!!.isPlaying()) {
-                            mService!!.stop()
-                            stopService(mIntent)
-                            mService = null
-                            btnPlay.setImageDrawable(getDrawable(R.drawable.btn_play))
-                        } else {
-                            mService!!.playSong()
-                            btnPlay.setImageDrawable(getDrawable(R.drawable.btn_stop))
-                        }
-                    } else {
-                        startServ().subscribeBy(
-                            onNext = {
-                                mService!!.playSong()
-                                btnPlay.setImageDrawable(getDrawable(R.drawable.btn_stop))
-                            }, onError = {
-                                toast(it.message!!)
-                            }
-                        )
-                    }
-                }
-        }
-        swVideo.setOnClickListener {
-            startActivity<VideoActivity>()
-            Prefs.typeMusic = false
-            finish()
-        }
-        animationContainer.setOnClickListener {
-            setAnimationGone()
-            setAnimationVisible()
+            actionPlay()
         }
 
+        animationContainer.setOnTouchListener { v, event ->
+            gestureDetectorCompat.onTouchEvent(event)
+            true
+        }
     }
 
     @SuppressLint("CheckResult")
     override fun onResume() {
         super.onResume()
-
-        supportFragmentManager
-            .beginTransaction()
-            .hide(keyboardFragment)
-            .commit()
-
         if (paused)
             paused = false
+
+        detectGesture.subscribe {
+            when (it) {
+                0 -> {
+                    audioManager.adjustVolume(AudioManager.ADJUST_RAISE, AudioManager.FLAG_PLAY_SOUND)
+                    showVolumeUpLabel(UP)
+                }
+                1 -> {
+                    audioManager.adjustVolume(AudioManager.ADJUST_LOWER, AudioManager.FLAG_PLAY_SOUND)
+                    showVolumeUpLabel(DOWN)
+                }
+                2 -> actionPrevious()
+                3 -> actionNext()
+                4 -> actionPlay()
+                5 -> {
+                    setAnimationGone()
+                    setAnimationVisible()
+                }
+                else -> toast("OTRO")
+            }
+        }
 
         hearPlayingSong
             .subscribe { (currPos, prevPos) ->
@@ -232,10 +179,6 @@ class MainActivity : AppCompatActivity() {
 
         dis add songAdapter.onClickSong
             .subscribe { song ->
-                supportFragmentManager
-                    .beginTransaction()
-                    .hide(keyboardFragment)
-                    .commit()
                 setAnimationVisible()
                 viewModel.isServiceRunning(mService)
                     .subscribe {
@@ -262,11 +205,6 @@ class MainActivity : AppCompatActivity() {
                         }
                     }
             }
-        publishText.subscribe {
-            setAnimationGone()
-            setAnimationVisible()
-            etSearch.setText(it)
-        }
     }
 
     override fun onPause() {
@@ -274,7 +212,98 @@ class MainActivity : AppCompatActivity() {
         paused = true
     }
 
-    fun setAnimationVisible() {
+    @SuppressLint("CheckResult")
+    fun actionPrevious() {
+        setAnimationVisible()
+        viewModel.isServiceRunning(mService)
+            .subscribe {
+                if (it) {
+                    mService!!.playPrev()
+                    if (playBackPaused)
+                        playBackPaused = false
+                    songList.scrollToPosition(mService!!.getCurrentPosition())
+                } else {
+                    startServ()
+                        .subscribe {
+                            mService!!.playPrev()
+                            if (playBackPaused)
+                                playBackPaused = false
+                            songList.scrollToPosition(mService!!.getCurrentPosition())
+                        }
+                }
+            }
+    }
+
+    @SuppressLint("CheckResult")
+    fun actionNext() {
+        setAnimationVisible()
+        viewModel.isServiceRunning(mService)
+            .subscribe {
+                if (it) {
+                    mService!!.playNext()
+                    if (playBackPaused)
+                        playBackPaused = false
+                    songList.scrollToPosition(mService!!.getCurrentPosition())
+                } else {
+                    startServ()
+                        .subscribe {
+                            mService!!.playNext()
+                            if (playBackPaused)
+                                playBackPaused = false
+                            songList.scrollToPosition(mService!!.getCurrentPosition())
+                        }
+                }
+
+            }
+    }
+
+    @SuppressLint("CheckResult")
+    fun actionPlay() {
+        setAnimationVisible()
+        viewModel.isServiceRunning(mService)
+            .subscribe {
+                if (it) {
+                    if (mService!!.isPlaying()) {
+                        mService!!.stop()
+                        stopService(mIntent)
+                        mService = null
+                        btnPlay.setImageDrawable(getDrawable(R.drawable.btn_play))
+                    } else {
+                        mService!!.playSong()
+                        btnPlay.setImageDrawable(getDrawable(R.drawable.btn_stop))
+                    }
+                } else {
+                    startServ().subscribeBy(
+                        onNext = {
+                            mService!!.playSong()
+                            btnPlay.setImageDrawable(getDrawable(R.drawable.btn_stop))
+                        }, onError = {
+                            toast(it.message!!)
+                        }
+                    )
+                }
+            }
+    }
+
+    private fun showVolumeUpLabel(direction: Int) {
+        myHandler.removeCallbacks(myVolumeRunnable)
+        val volume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC)
+        volumeValue.text = Math.round((volume * 100 / 15).toDouble()).toString()
+        when (direction) {
+            UP -> {
+                actionLabel.setImageDrawable(getDrawable(R.drawable.ic_volume_up))
+                actionText.text = getString(R.string.volume_up)
+            }
+            DOWN -> {
+                actionLabel.setImageDrawable(getDrawable(R.drawable.ic_volume_down))
+                actionText.text = getString(R.string.volume_down)
+            }
+        }
+        volumeGroup.visible()
+        myHandler.postDelayed(myVolumeRunnable, 2000)
+    }
+
+    private fun setAnimationVisible() {
         myHandler.removeCallbacks(myRunnable)
         myHandler.postDelayed(myRunnable, 5000)
     }
@@ -313,11 +342,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun setAnimationGone() {
-        screensaver.visibility = View.GONE
+        screensaver.gone()
     }
 
     override fun onDestroy() {
-        if(mService!=null){
+        if (mService != null) {
             Prefs.shuffle = mService!!.shuffle
             Prefs.lastSong = mService!!.getCurrentPosition()
             stopService(mIntent)
@@ -338,5 +367,12 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         val hearPlayingSong = PublishSubject.create<Pair<Int, Int>>()
+        val detectGesture = PublishSubject.create<Int>()
+        const val UP = 0
+        const val DOWN = 1
+        const val LEFT = 2
+        const val RIGHT = 3
+        const val TAP = 4
+        const val DOUBLE_TAP = 5
     }
 }

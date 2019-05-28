@@ -9,6 +9,7 @@
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.BLUETOOTH"/>
+    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
 
     <application
             android:name=".App"
@@ -19,10 +20,6 @@
             android:supportsRtl="true"
             android:theme="@style/AppTheme"
             tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".video.VideoActivity"
-                  android:launchMode="singleTop"
-                  android:screenOrientation="landscape">
-        </activity>
         <activity
                 android:name=".main.MainActivity"
                 android:launchMode="singleTop"

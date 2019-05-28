@@ -3,14 +3,19 @@ package com.cristiandev.mymusicplayer.service
 import android.app.*
 import android.bluetooth.BluetoothAdapter
 import android.content.*
+import android.media.AudioAttributes
 import android.media.AudioManager
 import android.media.MediaPlayer
 import android.os.Binder
 import android.os.Build
 import android.os.IBinder
 import android.os.PowerManager
+import android.provider.Telephony
 import android.support.v4.app.NotificationCompat
 import android.support.v4.app.NotificationManagerCompat
+import android.telecom.TelecomManager
+import android.telephony.PhoneStateListener
+import android.telephony.TelephonyManager
 import android.util.Log
 import com.cristiandev.mymusicplayer.R
 import com.cristiandev.mymusicplayer.data.model.Song
@@ -21,7 +26,7 @@ import java.lang.Exception
 import java.util.*
 
 class MusicService : Service(), MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListener,
-    MediaPlayer.OnCompletionListener,AudioManager.OnAudioFocusChangeListener {
+    MediaPlayer.OnCompletionListener, AudioManager.OnAudioFocusChangeListener {
 
     lateinit var player: MediaPlayer
     private var thsSongs = mutableListOf<Song>()
@@ -32,7 +37,7 @@ class MusicService : Service(), MediaPlayer.OnPreparedListener, MediaPlayer.OnEr
     val NOTIFY_ID = 1
     var shuffle = false
     lateinit var rand: Random
-//    lateinit var focus:AudioManager
+    var currentSongValue = 0
 
     override fun onCreate() {
 //        focus = AudioManager
@@ -40,6 +45,22 @@ class MusicService : Service(), MediaPlayer.OnPreparedListener, MediaPlayer.OnEr
         player = MediaPlayer()
         initMusicPlayer()
         rand = Random()
+        val manager = getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
+        manager.listen(callListener(), PhoneStateListener.LISTEN_CALL_STATE)
+    }
+
+    private fun callListener() = object : PhoneStateListener() {
+        override fun onCallStateChanged(state: Int, phoneNumber: String?) {
+            super.onCallStateChanged(state, phoneNumber)
+            if (state == TelephonyManager.CALL_STATE_RINGING) {
+                currentSongValue = player.currentPosition
+                player.pause()
+            }
+            if (state == TelephonyManager.CALL_STATE_IDLE) {
+                player.seekTo(currentSongValue)
+                player.start()
+            }
+        }
     }
 
     fun setShuffle() {
@@ -94,13 +115,12 @@ class MusicService : Service(), MediaPlayer.OnPreparedListener, MediaPlayer.OnEr
 
         val builder = NotificationCompat.Builder(this, NOTIFY_ID.toString())
             .setContentIntent(pendingIntent)
-            .setVibrate(null)
-            .setSmallIcon(R.drawable.ic_play)
+            .setSmallIcon(R.drawable.logo)
             .setTicker(songTitle)
             .setOngoing(true)
             .setContentTitle("Playing")
             .setContentText(songTitle)
-            .setVibrate(LongArray(1) { 0 })
+
         with(NotificationManagerCompat.from(this)) {
             notify(NOTIFY_ID, builder.build())
         }
@@ -173,10 +193,12 @@ class MusicService : Service(), MediaPlayer.OnPreparedListener, MediaPlayer.OnEr
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val name = "MyMusicChannel"
             val descriptionText = "MyMusicChannelDescription"
-            val importance = NotificationManager.IMPORTANCE_DEFAULT
+            val importance = NotificationManager.IMPORTANCE_NONE
             val channel = NotificationChannel(NOTIFY_ID.toString(), name, importance).apply {
                 description = descriptionText
             }
+            channel.vibrationPattern = longArrayOf(0L)
+            channel.enableVibration(true)
             // Register the channel with the system
             val notificationManager: NotificationManager =
                 getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
