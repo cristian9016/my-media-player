@@ -193,7 +193,7 @@ class MusicService : Service(), MediaPlayer.OnPreparedListener, MediaPlayer.OnEr
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val name = "MyMusicChannel"
             val descriptionText = "MyMusicChannelDescription"
-            val importance = NotificationManager.IMPORTANCE_NONE
+            val importance = NotificationManager.IMPORTANCE_LOW
             val channel = NotificationChannel(NOTIFY_ID.toString(), name, importance).apply {
                 description = descriptionText
             }

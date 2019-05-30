@@ -25,7 +25,7 @@ class MainViewModel : ViewModel() {
                         val title = cursor.getString(titleColumn)
                         val artist = cursor.getString(artistColumn)
                         val duration = cursor.getString(durationColumn)
-                        if(duration.toLong() > 120000)
+                        if(duration!=null && duration.toLong() > 120000)
                             list.add(Song(id, title, artist, duration))
                     } while (cursor.moveToNext())
                 }
